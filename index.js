@@ -13,7 +13,7 @@ const _ = require("lodash"),
 
 //-----------------------------------
 // Just set this:
-let TV_SHOW_NAME = "Vida";
+let TV_SHOW_NAME = "Vikings";
 //-----------------------------------
 
 let TV_SHOW_BASE_DIR = "//192.168.1.182/passport/bittorrent/TV Shows";
