@@ -6,7 +6,7 @@ const _ = require("lodash"),
 // This script:
 // - walks through a TV show dir
 // - looks for any files with SxxExx
-// - delets any non-SxxExx files
+// - deletes any non-SxxExx files
 // - choose the biggest of each, deletes the rest
 // - moves it to the expected location & name
 // - removes any empty subdirectories
