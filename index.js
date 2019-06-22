@@ -1,30 +1,17 @@
-const _ = require("lodash"),
-  fs = require("fs"),
-  path = require("path"),
-  walk = require("walk");
+const _ = require('lodash'),
+  fs = require('fs'),
+  path = require('path'),
+  walk = require('walk');
 
-// This script:
-// - walks through a TV show dir
-// - looks for any files with SxxExx
-// - deletes any non-SxxExx files
-// - choose the biggest of each, deletes the rest
-// - moves it to the expected location & name
-// - removes any empty subdirectories
-
-//-----------------------------------
-// Just set this:
-let TV_SHOW_NAME = "Vikings";
-//-----------------------------------
-
-let TV_SHOW_BASE_DIR = "//192.168.1.182/passport/bittorrent/TV Shows";
-let showDir = path.join(TV_SHOW_BASE_DIR, TV_SHOW_NAME);
+let showDir = process.cwd();
+let showName = require('path').basename(showDir);
 
 let seFiles = {};
 
 let walker = walk.walk(showDir, { followLinks: false });
 
-walker.on("file", function(root, stat, next) {
-  let matches = stat.name.match(/S\d\dE\d\d/gi, "");
+walker.on('file', function(root, stat, next) {
+  let matches = stat.name.match(/S\d\dE\d\d/gi, '');
   if (matches && matches.length > 0) {
     let seasonEpisode = matches[0].toUpperCase();
     if (!(seasonEpisode in seFiles)) {
@@ -46,25 +33,24 @@ walker.on("file", function(root, stat, next) {
   next();
 });
 
-function getAllSubDirs(dir)
-{
-    var results = [];
-    var list = fs.readdirSync(dir);
-    list.forEach(function(file) {
-        file = dir + '/' + file;
-        var stat = fs.statSync(file);
-        if (stat && stat.isDirectory()) { 
-            results.push(file);
-            /* Recurse into a subdirectory */
-            results = results.concat(getAllSubDirs(file));
-        }
-    });
-    return results;
+function getAllSubDirs(dir) {
+  var results = [];
+  var list = fs.readdirSync(dir);
+  list.forEach(function(file) {
+    file = dir + '/' + file;
+    var stat = fs.statSync(file);
+    if (stat && stat.isDirectory()) {
+      results.push(file);
+      /* Recurse into a subdirectory */
+      results = results.concat(getAllSubDirs(file));
+    }
+  });
+  return results;
 }
 
-walker.on("end", function() {
+walker.on('end', function() {
   for (var se in seFiles) {
-    let files = _.sortBy(seFiles[se], "size");
+    let files = _.sortBy(seFiles[se], 'size');
     let primaryFile = files[files.length - 1];
     for (i = 0; i < files.length - 1; i++) {
       console.log(`- deleting ${files[i].path} (${files[i].size})`);
@@ -73,7 +59,7 @@ walker.on("end", function() {
 
     let expectedLocation = path.join(
       showDir,
-      `${TV_SHOW_NAME} ${se}${path.extname(primaryFile.path)}`
+      `${showName} ${se}${path.extname(primaryFile.path)}`
     );
     if (!fs.existsSync(expectedLocation)) {
       console.log(`- moving ${primaryFile.path} to ${expectedLocation}`);
@@ -81,7 +67,7 @@ walker.on("end", function() {
     }
   }
 
-  let subDirs =  _.sortBy(getAllSubDirs(showDir), d=>d.length);
+  let subDirs = _.sortBy(getAllSubDirs(showDir), d => d.length);
   subDirs = subDirs.reverse();
   for (i = 0; i < subDirs.length; i++) {
     console.log(`- removing empty dir: ${subDirs[i]}`);
