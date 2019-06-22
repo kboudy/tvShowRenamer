@@ -6,3 +6,5 @@
 * renames the files
 * removes any empty subdirectories
 
+## tldr:
+* run `node ~/keith_apps/tvShowRenamer` from the show dir
