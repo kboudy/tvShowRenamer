@@ -10,10 +10,10 @@ let seFiles = {};
 
 let walker = walk.walk(showDir, { followLinks: false });
 
-walker.on('file', function(root, stat, next) {
-  let matches = stat.name.match(/S\d\dE\d\d/gi, '');
+walker.on('file', function (root, stat, next) {
+  let matches = stat.name.match(/S\d\d[ ]?E\d\d/gi, '');
   if (matches && matches.length > 0) {
-    let seasonEpisode = matches[0].toUpperCase();
+    let seasonEpisode = matches[0].toUpperCase().split(' ').join('');
     if (!(seasonEpisode in seFiles)) {
       seFiles[seasonEpisode] = [];
     }
@@ -36,7 +36,7 @@ walker.on('file', function(root, stat, next) {
 function getAllSubDirs(dir) {
   var results = [];
   var list = fs.readdirSync(dir);
-  list.forEach(function(file) {
+  list.forEach(function (file) {
     file = dir + '/' + file;
     var stat = fs.statSync(file);
     if (stat && stat.isDirectory()) {
@@ -48,7 +48,7 @@ function getAllSubDirs(dir) {
   return results;
 }
 
-walker.on('end', function() {
+walker.on('end', function () {
   for (var se in seFiles) {
     let files = _.sortBy(seFiles[se], 'size');
     let primaryFile = files[files.length - 1];
@@ -67,7 +67,7 @@ walker.on('end', function() {
     }
   }
 
-  let subDirs = _.sortBy(getAllSubDirs(showDir), d => d.length);
+  let subDirs = _.sortBy(getAllSubDirs(showDir), (d) => d.length);
   subDirs = subDirs.reverse();
   for (i = 0; i < subDirs.length; i++) {
     console.log(`- removing empty dir: ${subDirs[i]}`);
